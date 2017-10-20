@@ -1,6 +1,8 @@
 var express = require('express');
 var router = express.Router();
 var passport = require('passport');
+var models = require('../models/models.js');
+var User = models.user;
 const SpotifyStrategy = require('passport-spotify').Strategy;
 
 
@@ -11,19 +13,19 @@ passport.use(new SpotifyStrategy({
     callbackURL: "http://localhost:3000/auth/spotify/callback"
   },
   function(accessToken, refreshToken, profile, done) {
-    // User.findOrCreate({ spotifyId: profile.id }, function (err, user) {
-    //   return done(err, user);
-    // });
-    console.log("returning from spotify", accessToken, refreshToken, profile);
-    return done(null, profile)
+    User.findOrCreate({ spotifyId: profile.id }, function (err, user) {
+      return done(err, user);
+    });
+    // console.log("returning from spotify", accessToken, refreshToken, profile);
+    // return done(null, profile)
   }
 ));
 
 passport.serializeUser(function(user, done) {
-  done(null, user.username);
+  done(null, user);
 });
-passport.deserializeUser(function(username, done) {
-  done(null, {username: username});
+passport.deserializeUser(function(user, done) {
+  done(null, user);
 });
 
 router.use(passport.initialize());
@@ -45,32 +47,40 @@ router.get('/auth/spotify/callback',
   });
 
 //registration and login
-function validate(req){
-  req.checkBody('username', 'Invalid Username').notEmpty();
-  req.checkBody('password', 'Invalid password').notEmpty();
-  req.checkBody('confirmPassword', 'Please enter same password').notEmpty()
-};
+// function validate(req){
+//   req.checkBody('username', 'Invalid Username').notEmpty();
+//   req.checkBody('password', 'Invalid password').notEmpty();
+// };
+
+//encrypt password
+var crypto = require('crypto');
+function hashPassword(password){
+  var hash = crypto.createHash('sha256');
+  hash.update(password);
+  return hash.digest('hex');
+}
 
 router.post('/register', function(req, res){
-  validate(req);
-  var errors = req.validationErrors();
-  if(errors){
-    res.send(errors)
-  }else{
+  // validate(req);
+  // var errors = req.validationErrors();
+  // if(errors){
+  //   res.send(errors)
+  // }else{
+  //
+  // });
   var newUser = new User({
     username: req.body.username,
-    password: req.body.password,
-  });
-
+    password: hashPassword(req.body.password),
+  })
   newUser.save(function(error){
     if(error){
       res.send(error)
     }else{
       console.log('saved!');
       // res.send('Saved!')
-      res.redirect('/login')
+      res.redirect('/')
     }
-  })}
+  })
 });
 
 router.get('/logout', function(req, res){
