@@ -15,4 +15,25 @@ router.post('/login', function(req, res, next) {
   }
 })
 
+// router.post('/register', function(req, res) {
+//   // validation step
+//   var error = validateReq(req.body);
+//   if (error) {
+//     res.send(error)
+//   }
+//   var u = new models.User({
+//     username: req.body.username,
+//     password: req.body.password,
+//   });
+//   u.save(function(err, user) {
+//     if (err) {
+//       console.log(err);
+//       res.status(500).redirect('/signup');
+//       return;
+//     }
+//     console.log("Saved User: ", user);
+//     res.redirect('/login');
+//   });
+// });
+
 module.exports = router;
