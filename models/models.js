@@ -15,7 +15,8 @@ var userSchema = new Schema({
   password: String,
   spotifyId: String,
   access: String,
-  song: String
+  song: String,
+  roomName: String
 });
 
 var roomSchema = new Schema({
