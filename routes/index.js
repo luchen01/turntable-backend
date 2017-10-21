@@ -3,6 +3,7 @@ var router = express.Router();
 var passport = require('passport');
 var models = require('../models/models.js');
 var User = models.user;
+var axios = require('axios');
 const SpotifyStrategy = require('passport-spotify').Strategy;
 
 //Configure spotify strategy and passport
@@ -51,12 +52,15 @@ passport.deserializeUser(function(user, done) {
 router.use(passport.initialize());
 router.use(passport.session());
 
+
+
 router.get('/auth/spotify',
   passport.authenticate('spotify'),
   function(req, res){
     // The request will be redirected to spotify for authentication, so this
     // function will not be called.
-  });
+  }
+);
 
 //Use passport.authenticate(), specifying the 'spotify' strategy, to authenticate requests.
 router.get('/auth/spotify/callback',
@@ -65,8 +69,14 @@ router.get('/auth/spotify/callback',
     // Successful authentication, redirect home.
     console.log("req.user", req.user);
     res.redirect('/');
-  });
+  }
+);
 
+//registration and login
+// function validate(req){
+//   req.checkBody('username', 'Invalid Username').notEmpty();
+//   req.checkBody('password', 'Invalid password').notEmpty();
+// };
 
 //encrypt password
 var crypto = require('crypto');
@@ -77,6 +87,13 @@ function hashPassword(password){
 }
 
 router.post('/register', function(req, res){
+  // validate(req);
+  // var errors = req.validationErrors();
+  // if(errors){
+  //   res.send(errors)
+  // }else{
+  //
+  // });
   var newUser = new User({
     username: req.body.username,
     password: hashPassword(req.body.password),

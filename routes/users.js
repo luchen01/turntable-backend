@@ -66,4 +66,26 @@ router.post('/joinroom/:roomId', function(req, res, next){
     });
 });
 
+router.get('/userplaylists', function(req, res, next) {
+  axios.get('https://api.spotify.com/v1/me/playlists', {
+    headers: {
+      Authorization: "Bearer " + req.user.access
+    }
+  })
+  .then(function(resp) {
+    res.send(resp.data);
+  })
+})
+
+router.get('/playlisttracks', function(req, res, next) {
+  axios.get("https://api.spotify.com/v1/users/" + req.user.spotifyId + "/playlists/" + req.body.playlistId + "/tracks", {
+    headers: {
+      Authorization: "Bearer " + req.user.access
+    }
+  })
+  .then(function(resp) {
+    res.send(resp.data.items);
+  })
+})
+
 module.exports = router;
