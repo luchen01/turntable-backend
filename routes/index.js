@@ -3,7 +3,7 @@ var router = express.Router();
 var passport = require('passport');
 var models = require('../models/models.js');
 var User = models.User;
-  var axios = require('axios');
+var axios = require('axios');
 const SpotifyStrategy = require('passport-spotify').Strategy;
 
 //Configure spotify strategy and passport
@@ -56,7 +56,7 @@ router.use(passport.session());
 
 
 router.get('/auth/spotify',
-  passport.authenticate('spotify'),
+  passport.authenticate('spotify', {scope: ['user-read-email', 'user-read-private']}),
   function(req, res){
     // The request will be redirected to spotify for authentication, so this
     // function will not be called.
@@ -87,6 +87,10 @@ function hashPassword(password){
   hash.update(password);
   return hash.digest('hex');
 }
+
+router.post('/login', passport.authenticate('local'), function(req, res) {
+  res.send(req.user);
+});
 
 router.post('/register', function(req, res){
   // validate(req);
