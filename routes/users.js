@@ -13,15 +13,6 @@ var Room = models.room;
 //   }
 // });
 
-router.post('/login', function(req, res, next) {
-  if (req.body.password.length < 8) {
-    res.status(303).send('Plz enter longer password');
-  } else {
-    res.status(200).send('such good password');
-
-  }
-})
-
 //User/DJ can create new room
 router.post('/createroom', function(req, res, next){
   var newRoom = new Room ({
@@ -31,7 +22,8 @@ router.post('/createroom', function(req, res, next){
     hostName: req.user._id,
     longitude: req.body.longitude,
     latitude: req.body.latitude,
-    attendees: [req.user.username]
+    attendees: [{spotifyId: req.user.spotifyId,
+                name: req.user.username}]
   });
   console.log("newRoom", newRoom);
   newRoom.save(function(err) {
@@ -45,27 +37,7 @@ router.post('/createroom', function(req, res, next){
 });
 });
 
-//User can join existing rooms
-router.post('/joinroom/:roomId', function(req, res, next){
-    Room.findById(req.params.roomId, function(error,results){
-      if(error){
-        res.send(error)
-      }else{
-        results.attendees.push({
-          spotifyId: '000',
-          name: 'Luchen',
-          song: ''
-        });
-        results.save(function(err){
-          if(err){console.log(err);
-          }else{
-            res.send("JOINED ROOM")
-          }
-        })
-      }
-    });
-});
-
+//DJ can get all the play list in the current spotify account
 router.get('/userplaylists', function(req, res, next) {
   axios.get('https://api.spotify.com/v1/me/playlists', {
     headers: {
@@ -77,6 +49,7 @@ router.get('/userplaylists', function(req, res, next) {
   })
 })
 
+//DJ can choose the current spotify playlist as the queue
 router.get('/playlisttracks', function(req, res, next) {
   axios.get("https://api.spotify.com/v1/users/" + req.user.spotifyId + "/playlists/" + req.body.playlistId + "/tracks", {
     headers: {
@@ -87,5 +60,26 @@ router.get('/playlisttracks', function(req, res, next) {
     res.send(resp.data.items);
   })
 })
+
+//User can join existing rooms
+router.post('/joinroom/:roomId', function(req, res, next){
+    Room.findById(req.params.roomId, function(error,results){
+      if(error){
+        res.send(error)
+      }else{
+        results.attendees.push({
+          spotifyId: req.user.spotifyId,
+          name: req.user.username
+        });
+        results.save(function(err){
+          if(err){console.log(err);
+          }else{
+            res.send("JOINED ROOM")
+          }
+        })
+      }
+    });
+});
+
 
 module.exports = router;

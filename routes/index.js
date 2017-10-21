@@ -10,7 +10,7 @@ const SpotifyStrategy = require('passport-spotify').Strategy;
 passport.use(new SpotifyStrategy({
     clientID: process.env.SPOTIFY_CLIENT_ID,
     clientSecret: process.env.SPOTIFY_CLIENT_SECRET,
-    callbackURL: "http://localhost:3000/auth/spotify/callback"
+    callbackURL: "https://turntableapp.herokuapp.com/"
   },
   function(accessToken, refreshToken, profile, done) {
     var access = accessToken;

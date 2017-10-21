@@ -28,7 +28,10 @@ var roomSchema = new Schema({
   // },
   longitude: String,
   latitude: String,
-  attendees: Array,
+  attendees: [{
+    spotifyId: String,
+    name: String
+  }],
   description: String,
   tracks: {
     type: mongoose.Schema.ObjectId,
