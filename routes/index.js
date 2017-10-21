@@ -26,6 +26,7 @@ passport.use(new SpotifyStrategy({
             access: access,
             spotifyId: profile.id,
             provider: 'spotify',
+
             //now in the future searching on User.findOne({'facebook.id': profile.id } will match because of this next line
             });
             user.save(function(err) {
@@ -68,7 +69,7 @@ router.get('/auth/spotify/callback',
   function(req, res) {
     // Successful authentication, redirect home.
     console.log("req.user", req.user);
-    res.redirect('/');
+    res.send(req.user);
   }
 );
 
@@ -104,7 +105,6 @@ router.post('/register', function(req, res){
     }else{
       console.log('saved!');
       // res.send('Saved!')
-      res.redirect('/')
     }
   })
 });
