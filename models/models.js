@@ -10,28 +10,17 @@ var Schema = mongoose.Schema;
 // are like your building!
 
 var userSchema = new Schema({
+  profilePhoto:String,
   username: String,
   password: String,
   spotifyId: String,
+  access: String,
   song: String,
   room: {
     type: mongoose.Schema.ObjectId,
     ref: 'Room'
   }
 });
-
-userSchema.statics.findOrCreate = function findOrCreate(profile, cb){
-    var userObj = new this();
-    this.findOne({_id : profile.id},function(err,result){
-        if(!result){
-            userObj.username = profile.displayName;
-            //....
-            userObj.save(cb);
-        }else{
-            cb(err,result);
-        }
-    });
-};
 
 var roomSchema = new Schema({
   roomName: String,

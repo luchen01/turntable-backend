@@ -5,7 +5,6 @@ var models = require('../models/models.js');
 var User = models.user;
 const SpotifyStrategy = require('passport-spotify').Strategy;
 
-
 //Configure spotify strategy and passport
 passport.use(new SpotifyStrategy({
     clientID: process.env.SPOTIFY_CLIENT_ID,
@@ -13,13 +12,36 @@ passport.use(new SpotifyStrategy({
     callbackURL: "http://localhost:3000/auth/spotify/callback"
   },
   function(accessToken, refreshToken, profile, done) {
-    User.findOrCreate({ spotifyId: profile.id }, function (err, user) {
-      return done(err, user);
-    });
-    // console.log("returning from spotify", accessToken, refreshToken, profile);
-    // return done(null, profile)
-  }
-));
+    var access = accessToken;
+    console.log('profile', profile);
+    console.log('access', access);
+  User.findOne({
+        spotifyId: profile.id
+    }, function(err, user) {
+    if (err) {return done(err);}
+//No user was found... so create a new user with values from Facebook (all the profile. stuff)
+    if (!user) {
+        user = new User({
+          username: profile.displayName,
+          profilePhoto: profile.photos[0],
+          access: access,
+          spotifyId: profile.id,
+          provider: 'spotify',
+          //now in the future searching on User.findOne({'facebook.id': profile.id } will match because of this next line
+          });
+          user.save(function(err) {
+              if (err) console.log(err);
+              return done(err, user);
+          });
+      } else {
+          //found user. Return
+          console.log('new access', access);
+          return done(err, user);
+      }
+  });
+
+})
+)
 
 passport.serializeUser(function(user, done) {
   done(null, user);
@@ -46,11 +68,6 @@ router.get('/auth/spotify/callback',
     res.redirect('/');
   });
 
-//registration and login
-// function validate(req){
-//   req.checkBody('username', 'Invalid Username').notEmpty();
-//   req.checkBody('password', 'Invalid password').notEmpty();
-// };
 
 //encrypt password
 var crypto = require('crypto');
@@ -61,13 +78,6 @@ function hashPassword(password){
 }
 
 router.post('/register', function(req, res){
-  // validate(req);
-  // var errors = req.validationErrors();
-  // if(errors){
-  //   res.send(errors)
-  // }else{
-  //
-  // });
   var newUser = new User({
     username: req.body.username,
     password: hashPassword(req.body.password),
