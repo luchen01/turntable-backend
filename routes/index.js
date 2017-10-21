@@ -3,8 +3,8 @@ var router = express.Router();
 var passport = require('passport');
 var models = require('../models/models.js');
 var User = models.user;
+var axios = require('axios');
 const SpotifyStrategy = require('passport-spotify').Strategy;
-
 
 //Configure spotify strategy and passport
 passport.use(new SpotifyStrategy({
@@ -107,6 +107,28 @@ router.post('/register', function(req, res){
     }
   })
 });
+
+router.get('/userplaylists', function(req, res, next) {
+  axios.get('https://api.spotify.com/v1/me/playlists', {
+    headers: {
+      Authorization: "Bearer " + req.user.access
+    }
+  })
+  .then(function(resp) {
+    res.send(resp.data);
+  })
+})
+
+router.get('/playlisttracks', function(req, res, next) {
+  axios.get("https://api.spotify.com/v1/users/" + req.user.spotifyId + "/playlists/" + req.body.playlistId + "/tracks", {
+    headers: {
+      Authorization: "Bearer " + req.user.access
+    }
+  })
+  .then(function(resp) {
+    res.send(resp.data.items);
+  })
+})
 
 router.get('/logout', function(req, res){
   req.logout();
