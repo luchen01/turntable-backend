@@ -1,5 +1,7 @@
 var express = require('express');
 var router = express.Router();
+var models = require('../models/models.js');
+var Room = models.room;
 
 /* GET users listing. */
 
@@ -12,25 +14,21 @@ router.post('/login', function(req, res, next) {
   }
 })
 
-// router.post('/register', function(req, res) {
-//   // validation step
-//   var error = validateReq(req.body);
-//   if (error) {
-//     res.send(error)
-//   }
-//   var u = new models.User({
-//     username: req.body.username,
-//     password: req.body.password,
-//   });
-//   u.save(function(err, user) {
-//     if (err) {
-//       console.log(err);
-//       res.status(500).redirect('/signup');
-//       return;
-//     }
-//     console.log("Saved User: ", user);
-//     res.redirect('/login');
-//   });
-// });
+
+router.post('/createRoom', function(req, res, next){
+
+  var newRoom = new Room ({
+    roomName: req.body.roomName,
+    created: date(),
+    hostName: req.user._id,
+    longitude: req.body.longitude,
+    latitude: req.body,latitude,
+    attendees: [req.user.username]
+  });
+  newRoom.save(function(err) {
+      if (err) {console.log(err);}
+
+  });
+})
 
 module.exports = router;
