@@ -15,51 +15,43 @@ var userSchema = new Schema({
   password: String,
   spotifyId: String,
   access: String,
-  song: String,
-  room: {
-    type: mongoose.Schema.ObjectId,
-    ref: 'Room'
-  }
+  song: String
 });
 
 var roomSchema = new Schema({
   roomName: String,
   created: Date,
-  hostName: {
-    type: mongoose.Schema.ObjectId,
-    ref: 'User'
-  },
+  hostName: String,
+  // hostName: {
+  //   type: mongoose.Schema.ObjectId,
+  //   ref: 'User'
+  // },
   longitude: String,
   latitude: String,
-  attendees: Array
-
+  attendees: Array,
+  description: String,
+  tracks: {
+    type: mongoose.Schema.ObjectId,
+    ref: 'Playlist'
+  }
 });
 
 var playlistSchema = new Schema({
-
-  created: Date,
-  content: String,
-  user: {
-    type: mongoose.Schema.ObjectId,
-    ref:'User'
-  },
-  contact: {
-    type: mongoose.Schema.ObjectId,
-    ref:'Contact'
-  },
-  channel: String,
-  status: String,
-  from: String
+  song: [{
+    songName: String,
+    songId: String,
+    vote: Array
+  }]
 });
 
 // Step 2: Create all of your models here, as properties.
-var userModel = mongoose.model('user', userSchema);
-var roomModel = mongoose.model('room', roomSchema);
-var playlistModel = mongoose.model('playlist', playlistSchema);
+var userModel = mongoose.model('User', userSchema);
+var roomModel = mongoose.model('Room', roomSchema);
+var playlistModel = mongoose.model('Playlist', playlistSchema);
 
 // Step 3: Export your models object
 module.exports = {
-  user: userModel,
-  room: roomModel,
-  playlist: playlistModel
+  User: userModel,
+  Room: roomModel,
+  Playlist: playlistModel
 };
