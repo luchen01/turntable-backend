@@ -1,7 +1,7 @@
 var express = require('express');
 var router = express.Router();
 var models = require('../models/models.js');
-var Room = models.room;
+var Room = models.Room;
 
 /* GET users listing. */
 //if user is not logged in, redirect to login page

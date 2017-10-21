@@ -2,7 +2,7 @@ var express = require('express');
 var router = express.Router();
 var passport = require('passport');
 var models = require('../models/models.js');
-var User = models.user;
+var User = models.User;
 var axios = require('axios');
 const SpotifyStrategy = require('passport-spotify').Strategy;
 
