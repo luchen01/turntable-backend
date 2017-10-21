@@ -179,4 +179,12 @@ router.post('/like', function(req, res, next){
   })
 });
 
+// router.put('/playsongs', function(req, res, next){
+//   axios.put("https://api.spotify.com/v1/me/player/play", {
+//     headers: {
+//       Authorization: "Bearer " + req.body.access
+//     }
+//   }).then(res.send("playyy songs"))
+// })
+
 module.exports = router;
