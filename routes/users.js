@@ -5,6 +5,13 @@ var axios = require('axios');
 var User = models.User;
 var Room = models.Room;
 
+var crypto = require('crypto');
+function hashPassword(password){
+  console.log(password);
+  var hash = crypto.createHash('sha256');
+  hash.update(password);
+  return hash.digest('hex');
+};
 
 /* GET users listing. */
 //if user is not logged in, redirect to login page
@@ -46,10 +53,18 @@ router.get('/allrooms', function(req, res, next){
   });
 })
 
+router.post('/getUser', function(req, res, next){
+  User.findOne({username: req.body.username, password: hashPassword(req.body.password)}, function(error, results){
+    if(error){
+      res.send(error)
+    }else{
+      res.send(results)
+    }
+  })
+});
+
 //DJ can get all the play list in the current spotify account
 router.post('/userplaylists', function(req, res, next) {
-  console.log('inside playlist');
-  console.log('spotifyId', req.body.spotifyId);
   User.findOne({spotifyId: req.body.spotifyId}, function(error, results){
     if(error){
       res.send(error)
@@ -64,7 +79,7 @@ router.post('/userplaylists', function(req, res, next) {
         }
       })
       .then(function(resp) {
-        console.log("resp",resp);
+        // console.log("resp",resp);
         res.send(resp.data);
       })
   }
@@ -108,5 +123,22 @@ router.post('/joinroom/:roomId', function(req, res, next){
     });
 });
 
+//Like songs
+router.post('/like', function(req, res, next){
+  User.findOne({username: req.body.username}, function(error, results){
+    if(error){
+      res.send(error)
+    }else{
+      results.song = req.body.song;
+      results.save(function(err){
+        if(err){
+          console.log(err);
+        }else{
+          res.send(results)
+        }
+      })
+    }
+  });
+});
 
 module.exports = router;

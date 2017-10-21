@@ -115,6 +115,7 @@ router.post('/register', function(req, res){
   var newUser = new User({
     username: req.body.username,
     password: hashPassword(req.body.password),
+    song:'',
   })
   newUser.save(function(error){
     if(error){
