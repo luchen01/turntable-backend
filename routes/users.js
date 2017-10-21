@@ -14,16 +14,6 @@ function hashPassword(password){
   return hash.digest('hex');
 };
 
-/* GET users listing. */
-//if user is not logged in, redirect to login page
-// router.use(function(req, res, next){
-//   if (!req.user) {
-//     res.redirect('/');
-//   } else {
-//     return next();
-//   }
-// });
-
 //User/DJ can create new room
 router.post('/createroom', function(req, res, next){
   var newRoom = new Room ({
@@ -36,7 +26,6 @@ router.post('/createroom', function(req, res, next){
     attendees: [{spotifyId: req.body.spotifyId}],
     tracks: req.body.playlistId
   });
-  console.log("newRoom", newRoom);
   newRoom.save(function(err) {
     if(err){
       res.send(err)
@@ -51,7 +40,7 @@ router.get('/allrooms', function(req, res, next){
   Room.find(function(error, results){
     res.send(results)
   });
-})
+});
 
 router.post('/getUser', function(req, res, next){
   User.findOne({username: req.body.username, password: hashPassword(req.body.password)}, function(error, results){
@@ -83,7 +72,7 @@ router.post('/userplaylists', function(req, res, next) {
         res.send(resp.data);
       })
   }
-})
+});
 });
 
 //DJ can choose the current spotify playlist as the queue
@@ -94,19 +83,11 @@ router.post('/playlisttracks', function(req, res, next) {
     }
   })
   .then(function(resp) {
-    console.log(resp)
-    res.send(resp);
-  })
+    Playlist.find(function(err, results){
+      res.send(results)
+    })
 })
-
-//DJ can select playlist
-// router.post('/selectplaylist/:playlistId', function(req, res,next){
-//   Room.findById(req.body.roomId, function(error,results){
-//     if(error){
-//       res.send(error)
-//     }else{
-//       results.tracks =
-// })
+});
 
 //User can join existing rooms
 router.post('/joinroom/:roomId', function(req, res, next){
@@ -136,15 +117,22 @@ router.post('/joinroom/:roomId', function(req, res, next){
     });
 });
 
-router.post('/songs', function(req, res, next){
-  Room.findOne({roomName: req.body.roomName})
-  .populate('tracks')
-  .exec(function(err, room){
-    if(err){res.send(err)
-    }else{
-    res.send(room.tracks)
-  }
-  })
+router.get('/songs', function(req, res, next){
+    var returnSongs;
+    Playlist.find()
+    .sort({'vote': -1})
+    .exec(function(err, results){
+      returnSongs = results.slice();
+      for(var i = 0; i < returnSongs.length; i++){
+        console.log(returnSongs[i].vote);
+        returnSongs[i].voteNum = returnSongs[i].vote.length
+      };
+      returnSongs = returnSongs.sort(function(a,b){
+        return b.voteNum - a.voteNum
+      });
+      return res.send(returnSongs)
+    });
+
 });
 
 router.post('/addsongs', function(req, res){
@@ -152,28 +140,43 @@ router.post('/addsongs', function(req, res){
     songName: req.body.songName,
     songId:req.body.songid ,
     vote:''
-  })
-
+  });
   newSong.save();
-  res.send('saved!')
+  res.send(newSong);
 });
 
 //Like songs
 router.post('/like', function(req, res, next){
-  User.findOne({username: req.body.username}, function(error, results){
+  // User.findOne({username: req.body.username}, function(error, results){
+  //   if(error){
+  //     res.send(error)
+  //   }else{
+  //     results.song = req.body.song;
+  //     results.save(function(err){
+  //       if(err){
+  //         console.log(err);
+  //       }else{
+  //         res.send(results)
+  //       }
+  //     })
+  //   }
+  // })
+  Playlist.findOne({songName: req.body.songName}, function(error, results){
     if(error){
       res.send(error)
     }else{
-      results.song = req.body.song;
+      console.log(results);
+      results.vote.push(req.body.username);
       results.save(function(err){
         if(err){
           console.log(err);
         }else{
           res.send(results)
         }
-      })
+      });
+
     }
-  });
+  })
 });
 
 module.exports = router;

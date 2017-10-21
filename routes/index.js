@@ -72,7 +72,6 @@ router.get('/auth/spotify/callback',
   }
 );
 
-
 //local strategy login
 passport.use(new LocalStrategy(function(username, password, done) {
   User.findOne({username: username }, function (err, user) {
@@ -129,8 +128,7 @@ router.post('/register', function(req, res){
 
 router.get('/logout', function(req, res){
   req.logout();
-  res.redirect('/login');
-})
+});
 
 router.get('/', function(req, res, next) {
   res.render('index', { title: 'Express' });
