@@ -2,9 +2,6 @@ var express = require('express');
 var router = express.Router();
 
 /* GET users listing. */
-// router.get('/login', function(req, res, next) {
-//   res.send('Send');
-// }
 
 router.post('/login', function(req, res, next) {
   if (req.body.password.length < 8) {

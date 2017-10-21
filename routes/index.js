@@ -31,6 +31,8 @@ passport.deserializeUser(function(user, done) {
 router.use(passport.initialize());
 router.use(passport.session());
 
+
+
 router.get('/auth/spotify',
   passport.authenticate('spotify'),
   function(req, res){
