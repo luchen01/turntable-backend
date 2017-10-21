@@ -42,9 +42,8 @@ router.post('/createroom', function(req, res, next){
     if(err){
       res.send(err)
     }else{
-      console.log('saved!');
       // res.send('Saved!')
-      res.redirect('/')
+      res.send(newRoom);
   }
 });
 });
@@ -147,7 +146,7 @@ router.post('/songs', function(req, res, next){
     res.send(room.tracks)
   }
   })
-})
+});
 
 router.post('/addsongs', function(req, res){
   var newSong = new Playlist({
@@ -158,7 +157,8 @@ router.post('/addsongs', function(req, res){
 
   newSong.save();
   res.send('saved!')
-})
+});
+
 //Like songs
 router.post('/like', function(req, res, next){
   User.findOne({username: req.body.username}, function(error, results){
