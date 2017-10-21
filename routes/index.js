@@ -5,6 +5,7 @@ var models = require('../models/models.js');
 var User = models.User;
 var axios = require('axios');
 const SpotifyStrategy = require('passport-spotify').Strategy;
+var LocalStrategy = require('passport-local').Strategy;
 
 //Configure spotify strategy and passport
 passport.use(new SpotifyStrategy({
@@ -26,7 +27,6 @@ passport.use(new SpotifyStrategy({
             access: access,
             spotifyId: profile.id,
             provider: 'spotify',
-
             //now in the future searching on User.findOne({'facebook.id': profile.id } will match because of this next line
             });
             user.save(function(err) {
@@ -35,11 +35,13 @@ passport.use(new SpotifyStrategy({
             });
         } else {
             //found user. Return
-            console.log('new access', access);
-            return done(err, user);
+            user.access = access;
+            user.save(function(err){
+              if(err) console.log(err);
+              return done(err, user);
+            })
         }
   });
-
 })
 )
 
@@ -53,8 +55,6 @@ passport.deserializeUser(function(user, done) {
 router.use(passport.initialize());
 router.use(passport.session());
 
-
-
 router.get('/auth/spotify',
   passport.authenticate('spotify', {scope: ['user-read-email', 'user-read-private']}),
   function(req, res){
@@ -67,17 +67,29 @@ router.get('/auth/spotify',
 router.get('/auth/spotify/callback',
   passport.authenticate('spotify', { failureRedirect: '/login' }),
   function(req, res) {
-    // Successful authentication, redirect home.
     console.log("req.user", req.user);
     res.send(req.user);
   }
 );
 
-//registration and login
-// function validate(req){
-//   req.checkBody('username', 'Invalid Username').notEmpty();
-//   req.checkBody('password', 'Invalid password').notEmpty();
-// };
+
+//local strategy login
+passport.use(new LocalStrategy(function(username, password, done) {
+  User.findOne({username: username }, function (err, user) {
+    if (err) {
+      console.log(err);
+      return done(err);
+    }
+    if (!user) {
+      console.log(user);
+      return done(null, false);
+    }
+    if (user.password !== hashPassword(password)) {
+      return done(null, false);
+    }
+    return done(null, user);
+  });
+}));
 
 //encrypt password
 var crypto = require('crypto');

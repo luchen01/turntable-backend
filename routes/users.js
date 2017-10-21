@@ -2,6 +2,7 @@ var express = require('express');
 var router = express.Router();
 var models = require('../models/models.js');
 var axios = require('axios');
+var User = models.User;
 var Room = models.Room;
 
 
@@ -39,17 +40,36 @@ router.post('/createroom', function(req, res, next){
 });
 });
 
-//DJ can get all the play list in the current spotify account
-router.get('/userplaylists', function(req, res, next) {
-  axios.get('https://api.spotify.com/v1/me/playlists', {
-    headers: {
-      Authorization: "Bearer " + req.user.access
-    }
-  })
-  .then(function(resp) {
-    res.send(resp.data);
-  })
+router.get('/allrooms', function(req, res, next){
+  Room.find(function(error, results){
+    res.send(results)
+  });
 })
+
+//DJ can get all the play list in the current spotify account
+router.post('/userplaylists', function(req, res, next) {
+  console.log('inside playlist');
+  console.log('spotifyId', req.body.spotifyId);
+  User.findOne({spotifyId: req.body.spotifyId}, function(error, results){
+    if(error){
+      res.send(error)
+    }
+    if(!results){
+      res.send("Need to have a spotify account")
+    }
+    else{
+      axios.get('https://api.spotify.com/v1/me/playlists', {
+        headers: {
+          Authorization: "Bearer " + results.access
+        }
+      })
+      .then(function(resp) {
+        console.log("resp",resp);
+        res.send(resp.data);
+      })
+  }
+})
+});
 
 //DJ can choose the current spotify playlist as the queue
 router.get('/playlisttracks', function(req, res, next) {
@@ -63,6 +83,10 @@ router.get('/playlisttracks', function(req, res, next) {
     res.send(console.log(resp));
   })
 })
+
+// router.get('/:spotifyId', function(req, res, next){
+//   User.findOne()
+// })
 
 //User can join existing rooms
 router.post('/joinroom/:roomId', function(req, res, next){
