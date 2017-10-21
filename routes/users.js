@@ -30,11 +30,10 @@ router.post('/createroom', function(req, res, next){
     description: req.body.description,
     roomName: req.body.roomName,
     created: Date.now(),
-    hostName: req.user.spotifyId,
+    hostName: req.body.spotifyId,
     longitude: req.body.longitude,
     latitude: req.body.latitude,
-    attendees: [{spotifyId: req.user.spotifyId,
-                name: req.user.username}],
+    attendees: [{spotifyId: req.body.spotifyId}],
     tracks: req.body.playlistId
   });
   console.log("newRoom", newRoom);
