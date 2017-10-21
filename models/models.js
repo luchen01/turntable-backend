@@ -21,11 +21,11 @@ var userSchema = new Schema({
 var roomSchema = new Schema({
   roomName: String,
   created: Date,
-  hostName: String,
-  // hostName: {
-  //   type: mongoose.Schema.ObjectId,
-  //   ref: 'User'
-  // },
+  // hostName: String,
+  host: {
+    spotifyId:String,
+    name: String,
+  },
   longitude: String,
   latitude: String,
   attendees: [{

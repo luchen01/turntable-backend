@@ -3,7 +3,7 @@ var router = express.Router();
 var passport = require('passport');
 var models = require('../models/models.js');
 var User = models.User;
-var axios = require('axios');
+  var axios = require('axios');
 const SpotifyStrategy = require('passport-spotify').Strategy;
 
 //Configure spotify strategy and passport
@@ -82,6 +82,7 @@ router.get('/auth/spotify/callback',
 //encrypt password
 var crypto = require('crypto');
 function hashPassword(password){
+  console.log(password);
   var hash = crypto.createHash('sha256');
   hash.update(password);
   return hash.digest('hex');
@@ -103,8 +104,7 @@ router.post('/register', function(req, res){
     if(error){
       res.send(error)
     }else{
-      console.log('saved!');
-      // res.send('Saved!')
+      res.send(newUser);
     }
   })
 });
