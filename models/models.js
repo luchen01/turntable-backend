@@ -47,7 +47,6 @@ var roomSchema = new Schema({
 });
 
 var playlistSchema = new Schema({
-
   created: Date,
   content: String,
   user: {

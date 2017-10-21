@@ -13,7 +13,7 @@ passport.use(new SpotifyStrategy({
     callbackURL: "http://localhost:3000/auth/spotify/callback"
   },
   function(accessToken, refreshToken, profile, done) {
-    User.findOrCreate({ spotifyId: profile.id }, function (err, user) {
+    User.findOrCreate({ spotifyId: profile.id, accessToken: accessToken }, function (err, user) {
       return done(err, user);
     });
     // console.log("returning from spotify", accessToken, refreshToken, profile);
@@ -36,7 +36,8 @@ router.get('/auth/spotify',
   function(req, res){
     // The request will be redirected to spotify for authentication, so this
     // function will not be called.
-  });
+  }
+);
 
 //Use passport.authenticate(), specifying the 'spotify' strategy, to authenticate requests.
 router.get('/auth/spotify/callback',
@@ -44,7 +45,8 @@ router.get('/auth/spotify/callback',
   function(req, res) {
     // Successful authentication, redirect home.
     res.redirect('/');
-  });
+  }
+);
 
 //registration and login
 // function validate(req){
