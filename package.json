@@ -12,12 +12,10 @@
     "eslint": "^4.9.0",
     "express": "~4.15.5",
     "jade": "~1.11.0",
+    "mongoose": "^4.12.3",
     "morgan": "~1.9.0",
     "passport": "^0.4.0",
-<<<<<<< HEAD
-=======
     "passport-spotify": "^0.3.1",
->>>>>>> a3f62e4831fe495bec7717319c7635613268e991
     "serve-favicon": "~2.4.5"
   }
 }
