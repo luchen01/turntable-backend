@@ -34,10 +34,7 @@ var roomSchema = new Schema({
     name: String
   }],
   description: String,
-  tracks: {
-    type: mongoose.Schema.ObjectId,
-    ref: 'Playlist'
-  }
+  tracks: String
 });
 
 var playlistSchema = new Schema({
